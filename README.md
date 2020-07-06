@@ -108,5 +108,5 @@ Pardiso as the linear solver while running EM3DANI (but it does not affect the b
 
  `include("runFwd.jl")`
 
-There are several example running scripts in subdirectories of the directory `./example`, which are well documented. Please
+There are several example running scripts in subdirectories of the directory `./examples`, which are well documented. Please
 refer to them for how to call the functions of EM3DANI to perform forward modeling.
