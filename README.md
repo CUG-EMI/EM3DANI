@@ -12,7 +12,7 @@ The main part of EM3DANI is licensed under the [Apache Licence 2.0](http://www.a
 ## File structure
 * **./doc** :        an instruction of file format.
 
-* **./examples** :   contains subdirectories corresponding to different types of synthetic examples, including all those presented in the manuscript. Each subdirectory has its own README.
+* **./examples** :   contains subdirectories corresponding to different types of synthetic examples, including all those presented in the manuscript.
 
 * **./src** :        source code.
 
