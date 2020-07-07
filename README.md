@@ -2,7 +2,7 @@
 
 EM3DANI is a package for isotropic/anisotropic 3D forward modeling of frequency-domain electromagnetic (CSEM and MT) data written in the [Julia language](http://julialang.org).
 
-*  Authors: Ronghua Peng and Bo Han (China University of Geosciences (Wuhan)).
+*  Authors: [Ronghua Peng](https://github.com/prhjiajie) and [Bo Han](https://github.com/hanbo1735) (China University of Geosciences (Wuhan)).
 
 ## License
 
