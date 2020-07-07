@@ -77,7 +77,6 @@ EM3DANI utilizes three third-party Julia packages as the linear solver, namely *
 ```jl
 (v1.0) pkg>
 ```
-To get back to the Julia REPL, press backspace or ^C.
 
 * **KrylovMethods.jl** is a *registered* Julia package, thus it can be added simply by typing `add KrylovMethods` from the **Pkg REPL**. However, the current registered version does not contain an implementation of **QMR** method. Therefore, we recommend to add our forked version by through a URL, which is like:
 
@@ -95,6 +94,8 @@ To get back to the Julia REPL, press backspace or ^C.
 
 * **Pardiso.jl** is a *registered* Julia package, thus it can be added simply by typing `add Pardiso` from the Pkg REPL, and it will be built automatically. Currently we have only utilized the MKL version of Pardiso, thus you need to have the **MKL library** preinstalled if you want to use
 Pardiso as the linear solver while running EM3DANI (but it does not affect the building process).
+
+To get back to Julia REPL from Pkg REPL, press `backspace` or `^C`.
 
 
 ## Running the EM3DANI code
