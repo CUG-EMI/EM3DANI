@@ -79,13 +79,17 @@ EM3DANI utilizes three third-party Julia packages as the linear solver, namely *
 ```
 To get back to the Julia REPL, press backspace or ^C.
 
-* **KrylovMethods.jl** is a *registered* Julia package, thus it can be added simply by typing `add KrylovMethods` from the **Pkg REPL**. However, the current registered version does not contain an implementation of **QMR** method. Therefore, we recommend to add our forked version by typing:
+* **KrylovMethods.jl** is a *registered* Julia package, thus it can be added simply by typing `add KrylovMethods` from the **Pkg REPL**. However, the current registered version does not contain an implementation of **QMR** method. Therefore, we recommend to add our forked version by through a URL, which is like:
 
- `add https://github.com/CUG-EMI/KrylovMethods.jl`
+ ```jl
+ (v1.0) pkg> add https://github.com/CUG-EMI/KrylovMethods.jl
+ ```
 
-* **MUMPS.jl** was a *registered* Julia package, but it's not any more and has been renamed as [MUMPSjInv.jl](https://github.com/JuliaInv/MUMPSjInv.jl). Therefore, we recommend to add our forked version by typing:
+* **MUMPS.jl** was a *registered* Julia package, but it's not any more and has been renamed as [MUMPSjInv.jl](https://github.com/JuliaInv/MUMPSjInv.jl). Therefore, we recommend to add our forked version:
 
- `add https://github.com/CUG-EMI/MUMPS.jl`
+ ```jl
+ (v1.0) pkg> add https://github.com/CUG-EMI/MUMPS.jl
+ ```
 
  If you wish to use MUMPS as the linear solver, then you need to build **MUMPS.jl** manually after adding it. First, find out where the Julia packages locate. By default, on Linux they are at (for example) `/home/username/.julia/packages/`. Then go to the MUMPS source folder (for example) `/home/username/.julia/packages/MUMPS/xxxxx/src`, you can find that there are two or three complier options files named like `compiler_options.in` or `compiler_options_XXX.in`. There are two options to `Make`: If you have *Intel compiler (icc, ifort) combined with the MKL library*, then simply type `Make` from the shell command line; otherwise, you need to have *GNU compiler (gcc, gfortran) combined with the [OpenBLAS](http://www.openblas.net/) library* preinstalled (the [installation of OpenBLAS](https://github.com/xianyi/OpenBLAS/wiki/Installation-Guide) is quite straightforward), and rename the corresponding complier options file `compiler_options_OpenBLAS.in` as `compiler_options.in` before typing `Make`.
 
@@ -94,19 +98,34 @@ Pardiso as the linear solver while running EM3DANI (but it does not affect the b
 
 
 ## Running the EM3DANI code
+* First, go to the subdirectory of the **EM1DUtils** module, for example:  
+`cd home/username/code/EM3DANI/src/EM1DUtils/deps`
 
-* First, you need to let the EM3DANI package to be "loaded" by the current Julia environment. This is done by adding the parent directory of the package directory to  `LOAD_PATH`, a global environment variable of Julia. For example, the EM3DANI package is placed at `home/username/codes` on Linux or at `D:\\code` on Windows, then type the following command from the Julia REPL:
+ and then enter the Julia REPL, to build the **Dipole1D** library by "including" the script *build.jl*, which is like:
+ ```jl
+ julia> include("build.jl")
+ ```
 
- `push!(LOAD_PATH,"/home/username/code")`   (on Linux)
+* Second, you need to let the EM3DANI package to be "loaded" by the current Julia environment. This is done by adding the parent directory of the package directory to  `LOAD_PATH`, a global environment variable of Julia. For example, the EM3DANI package is placed at `home/username/codes` on Linux or at `D:\\code` on Windows, then type the following command from the Julia REPL:
 
- or
+ ```jl
+ julia> push!(LOAD_PATH,"/home/username/code")
+ ```
 
- `push!(LOAD_PATH,"D:\\code") `        (on Windows)   
+ on Linux, or
+
+ ```jl
+ julia> push!(LOAD_PATH,"D:\\code")
+ ```
+
+ on Windows.   
 
 
-* Second, go to the directory where the running script loated, and run the script by typing the following command (for example) from the Julia REPL:
+* Finally, go to the directory where the running script loated, and run the script by typing the following command (for example) from the Julia REPL:
 
- `include("runFwd.jl")`
+ ```jl
+ julia> include("runFwd.jl")
+ ```
 
 There are several example running scripts in subdirectories of the directory `./examples`, which are well documented. Please
 refer to them for how to call the functions of EM3DANI to perform forward modeling.
