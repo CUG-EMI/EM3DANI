@@ -84,13 +84,13 @@ EM3DANI utilizes three third-party Julia packages as the linear solver, namely *
  (v1.0) pkg> add https://github.com/CUG-EMI/KrylovMethods.jl
  ```
 
-* **MUMPS.jl** was a *registered* Julia package, but it's not any more and has been renamed as [MUMPSjInv.jl](https://github.com/JuliaInv/MUMPSjInv.jl). Therefore, we recommend to add our forked version:
+* **MUMPS.jl** was a *registered* Julia package, but it's not any more and has been renamed to [MUMPSjInv.jl](https://github.com/JuliaInv/MUMPSjInv.jl). Therefore, we recommend to add our forked version:
 
  ```jl
  (v1.0) pkg> add https://github.com/CUG-EMI/MUMPS.jl
  ```
 
- If you wish to use MUMPS as the linear solver, then you need to build **MUMPS.jl** manually after adding it. First, find out where the Julia packages locate. By default, on Linux they are at (for example) `/home/username/.julia/packages/`. Then go to the MUMPS source folder (for example) `/home/username/.julia/packages/MUMPS/xxxxx/src`, you can find that there are two or three complier options files named like `compiler_options.in` or `compiler_options_XXX.in`. There are two options to `Make`: If you have **Intel compiler** (icc, ifort) combined with the **MKL library**, then simply type `Make` from the shell command line; otherwise, you need to have **GNU compiler** (gcc, gfortran) combined with the [OpenBLAS](http://www.openblas.net/) library preinstalled (the [installation of OpenBLAS](https://github.com/xianyi/OpenBLAS/wiki/Installation-Guide) is quite straightforward), and rename the corresponding complier options file `compiler_options_OpenBLAS.in` as `compiler_options.in` before typing `Make`.
+ If you wish to use MUMPS as the linear solver, then you need to build **MUMPS.jl** manually after adding it. First, find out where the Julia packages locate. By default, on Linux they are at (for example) `/home/username/.julia/packages/`. Then go to the MUMPS source folder (for example) `/home/username/.julia/packages/MUMPS/xxxxx/src`, you can find that there are two or three complier options files named like `compiler_options.in` or `compiler_options_XXX.in`. There are two options to `Make`: If you have **Intel compiler** (icc, ifort) combined with the **MKL library**, then simply type `Make` from the shell command line; otherwise, you need to have **GNU compiler** (gcc, gfortran) combined with the [OpenBLAS](http://www.openblas.net/) library preinstalled (the [installation of OpenBLAS](https://github.com/xianyi/OpenBLAS/wiki/Installation-Guide) is quite straightforward), and rename the corresponding complier options file `compiler_options_OpenBLAS.in` to `compiler_options.in` before typing `Make`.
 
 * **Pardiso.jl** is a *registered* Julia package, thus it can be added simply by typing `add Pardiso` from the Pkg REPL, and it will be built automatically. Currently we have only utilized the MKL version of Pardiso, thus you need to have the **MKL library** preinstalled if you want to use
 Pardiso as the linear solver while running EM3DANI (but it does not affect the building process).
@@ -99,10 +99,10 @@ To get back to Julia REPL from Pkg REPL, press `backspace` or `^C`.
 
 
 ## Running the EM3DANI code
-* First, go to the subdirectory of the **EM1DUtils** module, for example:  
+* First, you need to build the **Dipole1D** library. Go to the subdirectory of the **EM1DUtils** module, for example:  
 `cd home/username/code/EM3DANI/src/EM1DUtils/deps`
 
- and then enter the Julia REPL, to build the **Dipole1D** library by "including" the script *build.jl*, which is like:
+ and then enter the Julia REPL, and "include" the script *build.jl*, which is like:
  ```jl
  julia> include("build.jl")
  ```
@@ -128,5 +128,49 @@ To get back to Julia REPL from Pkg REPL, press `backspace` or `^C`.
  julia> include("runFwd.jl")
  ```
 
-There are several example running scripts in subdirectories of the directory `./examples`, which are well documented. Please
-refer to them for how to call the functions of EM3DANI to perform forward modeling.
+### Writing a running script
+For each numerical example contained in the directory `./examples`, one or more running scripts named `runFwd.jl` or `runFwd_parallel.jl` have been provided. These scripts are well documented. A user can modify them to get his/her own.
+Following are explanations of several parameter settings which are not that easy to understand.
+
+#### Reference model
+The forward modeling algorithm is based on a secondary field formulation, thus a (1D) background/reference model must be provided to perform forward modeling. This is done by defining a variable of the composite type **RefModel**. It has two fields: *sig1D* and *depth1D*, containing the conductivities (S/m) and top depths (m) of an isotropic layered model, respectively. For example, the following codes define a variable of type **RefModel** named *refModel*, representing a marine 1D model with three layers (air-water-sediment):
+
+```
+refModel = RefModel(zeros(3), zeros(3))    # construct a variable of type RefModel
+refModel.sig1D   = [1e-8, 3.3, 1.0]        # the conductivities of air, sea water, and sediment
+refModel.depth1D = [-100000, 0, 1000.0]    # the top depths of air, sea water, and sediment layers
+```
+Because the top boundary of the reference model must coincide with that of the total model domain (read from the model file), the top depth of the first layer can be set to `-emMesh.origin[3]` for correctness and convenience:
+```
+refModel.depth1D = [-emMesh.origin[3], 0, 1000.0]
+```
+where **emMesh** is a variable of composite type **EMTensorMesh**, containing model & mesh parameters reading from the model file.
+
+
+#### Linear solver
+The parameters of linear solver are stored in a variable of composite type **DirectSolverParm** or **IterativeSolverParm**. For example, the following codes define a parameter set for the MUMPS direct solver:
+
+```
+lsParm = DirectSolverParm()
+lsParm.solverName = :mumps    # can be :mumps or :mklpardiso.
+lsParm.sym        = 1         # 0=unsymmetric, 1=symm. pos def, 2=general symmetric
+lsParm.ooc        = 0         # 0=in-core, 1=out-of-core
+lsParm.saveFac    = false     # whether or not saving the decomposation factors
+```
+for solving a symmetric, positive definite linear system with "In-Core" mode, not saving the matrix decomposation factors. Because the above parameter set is exactly the default value of a **DirectSolverParm** *constructor*, the above codes are equivalent to:
+```
+lsParm = DirectSolverParm()
+```
+But if you want to use MKL Pardiso instead of MUMPS, then you have to set the solver name explicitly:
+```
+lsParm = DirectSolverParm()
+lsParm.solverName = :mklpardiso
+```
+For iterative solvers, on the other hand, the following is an example
+```
+lsParm = IterativeSolverParm()
+lsParm.iterMethod = :qmr
+lsParm.tol        = 1e-7
+lsParm.prec       = :aphi
+```
+which defines a QMR solver preconditioned with *A-phi*, with a relative residual tolerance of 1e-7.
