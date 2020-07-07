@@ -166,6 +166,13 @@ But if you want to use MKL Pardiso instead of MUMPS, then you have to set the so
 lsParm = DirectSolverParm()
 lsParm.solverName = :mklpardiso
 ```
+With regarding to the number of threads used by a direct solver (shared memory parallelism), although the type DirectSolverParm has a field *nThread* to specify it for MKL Pardiso, it is recommend to specify it by setting the global environment variable *OMP_NUM_THREADS* or *MKL_NUM_THREADS*, for example:
+```
+ENV["OMP_NUM_THREADS"] = 4
+ENV["MKL_NUM_THREADS"] = 4
+```
+
+
 For iterative solvers, on the other hand, the following is an example
 ```
 lsParm = IterativeSolverParm()
