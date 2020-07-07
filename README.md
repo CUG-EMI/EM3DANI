@@ -157,7 +157,7 @@ lsParm.sym        = 1         # 0=unsymmetric, 1=symm. pos def, 2=general symmet
 lsParm.ooc        = 0         # 0=in-core, 1=out-of-core
 lsParm.saveFac    = false     # whether or not saving the decomposation factors
 ```
-for solving a symmetric, positive definite linear system with "In-Core" mode, not saving the matrix decomposation factors. Because the above parameter set is exactly the default value of a **DirectSolverParm** *constructor*, the above codes are equivalent to:
+for solving a symmetric, positive definite linear system with "In-Core" mode, and not saving the matrix decomposation factors. Because the above parameter set is exactly the default value of a **DirectSolverParm** *constructor*, the above codes are equivalent to:
 ```
 lsParm = DirectSolverParm()
 ```
@@ -169,8 +169,9 @@ lsParm.solverName = :mklpardiso
 For iterative solvers, on the other hand, the following is an example
 ```
 lsParm = IterativeSolverParm()
-lsParm.iterMethod = :qmr
-lsParm.tol        = 1e-7
-lsParm.prec       = :aphi
+lsParm.iterMethod = :qmr        # can be :bicgstb or :qmr.
+lsParm.tol        = 1e-7        # relative residual tolerance
+lsParm.prec       = :aphi       # preconditioning method, only :aphi is allowed
+lsParm.maxIter    = 1000        # maximal iteration number
 ```
-which defines a QMR solver preconditioned with *A-phi*, with a relative residual tolerance of 1e-7.
+which defines a QMR solver preconditioned with *A-phi*, with a relative residual tolerance of 1e-7 and a maximal iteration number of 1000.
