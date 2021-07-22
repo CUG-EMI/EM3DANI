@@ -15,8 +15,9 @@ The main part of EM3DANI is licensed under the [Apache Licence 2.0](http://www.a
 * **./examples** :   contains subdirectories corresponding to different types of synthetic examples, including all those presented in the manuscript.
 
 * **./src** :        source code.
+* **./test** :       contains scripts for unit tests.
 
-## Setting up the Julia environment
+## Installation of Julia
 EM3DANI is compatible with Julia v0.7 and later versions. We recommend to install v1.0.5, the long-term support (LTS) release.
 ### Windows systems
 Go to the [Julia download page](https://julialang.org/downloads/) to download the Windows command line version (.exe) and install it.
@@ -56,7 +57,7 @@ There are three ways to install Julia on Linux:
 
   `sudo apt-get install julia`
 
-After a successful installation, Julia can be started by double-clicking the Julia executable (on Windows) or typing the `julia` from the command line (on Linux). Following is the Julia's command line environment (the so-called REPL):
+After a successful installation, Julia can be started by double-clicking the Julia executable (on Windows) or typing `julia` from the command line (on Linux). Following is the Julia's command line environment (the so-called REPL):
 
 
 ```jl
@@ -71,62 +72,91 @@ After a successful installation, Julia can be started by double-clicking the Jul
 julia>
 ```
 
-## Installing prerequisite Julia packages
+## Running the EM3DANI code
+### Setting up the package environment
+EM3DANI depends on several external packages (the so-called dependencies) which are not shipped with the package .zip file. These dependencies can be automatically resolved by activating and instantiating the package environment through [Julia's package manager (Pkg)](https://julialang.github.io/Pkg.jl/v1/). Go to the package directory, for example:  
+`cd home/username/code/EM3DANI`
 
-EM3DANI utilizes three third-party Julia packages as the linear solver, namely **KrylovMethods.jl**, **MUMPS.jl** and **Pardiso.jl**. Although you may wish to use only one of them, all the three packages need to be "added" to your Julia environment, which is done through Julia's package manager (Pkg). To Enter the Pkg REPL, press `]` from the Julia REPL and you should see a similar prompt:
+, and then enter the Julia REPL. Then press `]` from the Julia REPL you will enter the Pkg REPL which looks like
 ```jl
 (v1.0) pkg>
 ```
 
-* **KrylovMethods.jl** is a *registered* Julia package, thus it can be added simply by typing `add KrylovMethods` from the **Pkg REPL**. However, the current registered version does not contain an implementation of **QMR** method. Therefore, we recommend to add our forked version by through a URL, which is like:
+, indicating that you are currently in the environment named v1.0, Julia 1.0's default environment. To switch to the package environment, just `activate` the current directory:
+```jl
+(v1.0) pkg> activate .
+```
+you will get:
+```jl
+(EM3DANI) pkg>
+```
+indicating that you are in the environment EM3DANI. The environment will not be well-configured until you `instantiate` it:
+```jl
+(EM3DANI) pkg> instantiate
+```
+. By doing so the dependencies listed in `Project.toml` and `Manifest.toml` can be automatically downloaded and installed. However, you may need to build one of those dependencies manually (see below for details).
 
- ```jl
- (v1.0) pkg> add https://github.com/CUG-EMI/KrylovMethods.jl
- ```
+The main direct dependencies of EM3DANI are three linear solver packages, namely **KrylovMethods.jl**, **MUMPS.jl** and **Pardiso.jl**. Both **KrylovMethods.jl** and **Pardiso.jl** are registered Julia packages. **MUMPS.jl** was registered, but it's not any more and has been renamed to [MUMPSjInv.jl](https://github.com/JuliaInv/MUMPSjInv.jl), and the reference of **MUMPS.jl** in `Manifest.toml` points to [our forked repository of the formerly registered version](https://github.com/CUG-EMI/KrylovMethods.jl).
 
-* **MUMPS.jl** was a *registered* Julia package, but it's not any more and has been renamed to [MUMPSjInv.jl](https://github.com/JuliaInv/MUMPSjInv.jl). Therefore, we recommend to add our forked version:
-
- ```jl
- (v1.0) pkg> add https://github.com/CUG-EMI/MUMPS.jl
- ```
-
- If you wish to use MUMPS as the linear solver, then you need to build **MUMPS.jl** manually after adding it. First, find out where the Julia packages locate. By default, on Linux they are at (for example) `/home/username/.julia/packages/`. Then go to the MUMPS source folder (for example) `/home/username/.julia/packages/MUMPS/xxxxx/src`, you can find that there are two or three complier options files named like `compiler_options.in` or `compiler_options_XXX.in`. There are two options to `Make`: If you have **Intel compiler** (icc, ifort) combined with the **MKL library**, then simply type `Make` from the shell command line; otherwise, you need to have **GNU compiler** (gcc, gfortran) combined with the [OpenBLAS](http://www.openblas.net/) library preinstalled (the [installation of OpenBLAS](https://github.com/xianyi/OpenBLAS/wiki/Installation-Guide) is quite straightforward), and rename the corresponding complier options file `compiler_options_OpenBLAS.in` to `compiler_options.in` before typing `Make`.
-
-* **Pardiso.jl** is a *registered* Julia package, thus it can be added simply by typing `add Pardiso` from the Pkg REPL, and it will be built automatically. Currently we have only utilized the MKL version of Pardiso, thus you need to have the **MKL library** preinstalled if you want to use
-Pardiso as the linear solver while running EM3DANI (but it does not affect the building process).
+ If you wish to use MUMPS as the linear solver, then you need to build **MUMPS.jl** manually after instantiating the package environment. First, find out where the Julia packages locate. By default, on Linux they are at (for example) `/home/username/.julia/packages/`. Then go to the MUMPS source folder (for example) `/home/username/.julia/packages/MUMPS/xxxxx/src`, you can find that there are two or three complier options files named like `compiler_options.in` or `compiler_options_XXX.in`. There are two options to `Make`: 
+ 
+ * If you have **Intel compiler** (icc, ifort) combined with the **MKL library**, then simply type `Make` from the shell command line;
+ 
+ * Otherwise, you need to have **GNU compiler** (gcc, gfortran) combined with the [OpenBLAS](http://www.openblas.net/) library preinstalled. Besides, **cmake** may be required. It seems that GNU compiler and cmake are usually missing in a freshly installed Linux system such as Ubuntu. They can be installed by typing the following commands from shell:
+  
+   `sudo apt-get install gcc`
+   
+   `sudo apt-get install gfortran`
+   
+   `sudo apt-get install cmake`
+   
+   The installation of OpenBLAS can be found [here](https://github.com/xianyi/OpenBLAS/wiki/Installation-Guide). Please track the installation directory, because the exact location of the complied OpenBLAS library must be given in `compiler_options_OpenBLAS.in`. For example,
+   
+   `LIBBLAS = /opt/OpenBLAS/lib/libopenblas_haswellp-r0.3.10.a`
+   
+   points to the complied library of OpenBLAS v0.3.10. After adjusting `compiler_options_OpenBLAS.in`, rename it to `compiler_options.in` and type `Make` from the shell command line.
 
 To get back to Julia REPL from Pkg REPL, press `backspace` or `^C`.
 
 
-## Running the EM3DANI code
+### Testing and running the code
 * First, you need to build the **Dipole1D** library. Go to the subdirectory of the **EM1DUtils** module, for example:  
 `cd home/username/code/EM3DANI/src/EM1DUtils/deps`
 
- and then enter the Julia REPL, and "include" the script *build.jl*, which is like:
- ```jl
- julia> include("build.jl")
- ```
+  and then enter the Julia REPL, and "include" the script *build.jl*, which is like:
+  ```jl
+  julia> include("build.jl")
+  ```
 
 * Second, you need to let the EM3DANI package to be "loaded" by the current Julia environment. This is done by adding the parent directory of the package directory to  `LOAD_PATH`, a global environment variable of Julia. For example, the EM3DANI package is placed at `home/username/codes` on Linux or at `D:\\code` on Windows, then type the following command from the Julia REPL:
 
- ```jl
- julia> push!(LOAD_PATH,"/home/username/code")
- ```
+  ```jl
+  julia> push!(LOAD_PATH,"/home/username/code")
+  ```
 
- on Linux, or
+  on Linux, or
 
- ```jl
- julia> push!(LOAD_PATH,"D:\\code")
- ```
+  ```jl
+  julia> push!(LOAD_PATH,"D:\\code")
+  ```
 
- on Windows.   
+  on Windows.   
 
+* Third, go to the directory `.../EM3DANI/test`, you will see several Julia scripts which are for unit tests, run the one named *runtest.jl* by typing the following command from the Julia REPL:
+  ```jl
+  julia> include("runtest.jl")
+  ```
+  you will get the following information if no error occurs:
+  ```jl
+  Test Summary: | Pass Total
+  EM3DANI       |  149   149
+  ```
 
 * Finally, go to the directory where the running script loated, and run the script by typing the following command (for example) from the Julia REPL:
 
- ```jl
- julia> include("runFwd.jl")
- ```
+  ```jl
+  julia> include("runFwd.jl")
+  ```
 
 ### Writing a running script
 For each numerical example contained in the directory `./examples`, one or more running scripts named `runFwd.jl` or `runFwd_parallel.jl` have been provided. These scripts are well documented. A user can modify them to get his/her own.
@@ -166,6 +196,9 @@ But if you want to use MKL Pardiso instead of MUMPS, then you have to set the so
 lsParm = DirectSolverParm()
 lsParm.solverName = :mklpardiso
 ```
+It is worth mentioning that the memory requirement of a direct solver can be dramatically reduced
+by enabling the out-of-core (OOC) mode (setting lsParm.ooc to 1), in which the matrix factors are stored in disk rather than RAM of the computer. 
+
 With regarding to the number of threads used by a direct solver (shared memory parallelism), although the type DirectSolverParm has a field *nThread* to specify it for MKL Pardiso, it is recommend to specify it by setting the global environment variable *OMP_NUM_THREADS* or *MKL_NUM_THREADS*, for example:
 ```
 ENV["OMP_NUM_THREADS"] = 4
@@ -182,3 +215,44 @@ lsParm.prec       = :aphi       # preconditioning method, only :aphi is allowed
 lsParm.maxIter    = 1000        # maximal iteration number
 ```
 which defines a QMR solver preconditioned with *A-phi*, with a relative residual tolerance of 1e-7 and a maximal iteration number of 1000.
+
+### Parallel execution of the code
+Two different levels of parallelism have been implemented in EM3DANI: 
+
+* **Solving the large linear system using direct solvers:** at a low level the direct solver MUMPS or MKL Pardiso can solve the linear system of equations in parallel by exploiting a multi-threaded linear algebra library such as OpenBLAS and MKL BLAS (*shared memory parallelism*). 
+  
+  To utilize this type of parallelizaion, besides choosing a direct solver as the linear solver, you need to do nothing else. The code will involve multiple threads in forward computation automaticlly. In our experience, the direct solver will involve all available threads in solving equations if there is no explicit restriction on the number of threads, which can not always obtain the highest efficiency due to the relatively poor scalability of direct solvers (see [Puzyrev et al., 2016](https://www.sciencedirect.com/science/article/pii/S0098300416300164) [Han et al., 2018](https://library.seg.org/doi/10.1190/geo2017-0515.1) and among others) as well as the possible interferences among threads. The optimal number of threads generally increases with the problem size and the capacity of the computing platform. In our presented numerical examples, for example, the optimal number of threads is between 4 and 8 for the MT 1D anisotropic example (with a grid size of 22\*40\*102) and between 8 and 16 for the CSEM 1D example (with a grid size of 52\*114\*67).
+ 
+  The number of threads is stored in the global environment variable *OMP_NUM_THREADS* or *MKL_NUM_THREADS* (when the parallelization is offerred by the MKL BLAS library), which can be set from the shell like
+  
+   `shell> export OMP_NUM_THREADS = 4`
+
+   or from the Julia REPL like
+
+   `julia> ENV["OMP_NUM_THREADS"] = 4`
+
+* **Computing for multiple frequencies & transmitters:** at a higher level forward computations of multiple frequencies & transmitters can be distributed to different computer processors (*distributed parallelism*) by using Julia’s parallel computing mechanism.
+
+  To utilize this type of parallelizaion, first you need to launch multiple worker processes by either starting Julia like
+
+  `shell> julia -p 8`
+
+  or adding processes within Julia (recommended) like
+
+  `julia> addprocs(8)`
+  
+  Then you need to call the parallel forward modeling function **parsolveEM3DFwd** instead of the sequential one **solveEM3DFwd** (please refer to the various scripts named `runFwd_parallel.jl` within the `examples` directory).
+
+  There are two schemes for distributing the multiple forward computations: in terms of only frequencies (regardless of tranmitters/polarization modes) (Scheme 1), and in terms of frequencies and tranmitters (Scheme 2). The code is able to choose the optimal one automatically: if a) a direct solver is used as the linear solver or b) the number of tranmitters/polarization modes is less than two (which is impossible for MT) or c) the number of frequencies is divisible by the number of worker processes, Scheme 1 will be chosen, otherwise Scheme 2 will be chosen.
+
+In principle, the two levels of parallelism are independent of each other. However, they can affect each other in practice due the limited computing resources. For example, if we employ *n* worker processes to do the forward computation, each one solves the linear system using a direct solver with *m* threads involved, then there may be *n\*m* threads working simultaneously and the instantaneous peak memory usage may reach *n* times that of a single worker process, which can resulting unexpected poor scablity if the computer is not powerful enough.
+
+Therefore, to obtain a fine-tune parallel performance, a user need to balance the number of worker processes and the number of threads used by the direct solver (if chosen), taking the problem size, number of frequencies and tranmitters/polarization modes, and computer capacity into consideration.
+
+### Using the Julia plotting tools
+There are a few Julia plotting scripts in each numerical example directory (subdirectory of `.../EM3DANI/examples`) for plotting the data. These are developed by using the Julia package [Plots.jl](http://docs.juliaplots.org/latest/) and one of its "backends" [PyPlot.jl](https://github.com/JuliaPy/PyPlot.jl), both of which have been set as dependencies of EM3DANI (see the project file `Project.toml`). Thus, once EM3DANI is "instantiated", these plotting scripts can be directly run to generate figures without having to install any extra package. Nevertheless, We suggest one install [Juno](https://junolab.org/)/[Atom](https://atom.io/), so that a figure can be explicitly displayed in an interactive panel.
+
+
+
+## Notes
+* EM3DANI is not supposed to deal with complex topography since it employs a rectangular mesh.
