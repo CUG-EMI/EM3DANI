@@ -1,0 +1,27 @@
+Getting started ...
+Reading data file 0.25Hz_inline_broadside.dat:                0.0288 seconds.
+Reading model file canonical1D_vti.mod:                       1.3013 seconds.
+Calculating primary electric fields:    there are 1 task(s) assigned to each processor.
+      From worker 2:	Calculating primary field at freqID=1, txID=1 ...
+      From worker 3:	Calculating primary field at freqID=1, txID=2 ...
+      From worker 2:	     - Ex:     26.69 seconds.
+      From worker 3:	     - Ex:     28.93 seconds.
+      From worker 2:	     - Ey:     27.08 seconds.
+      From worker 3:	     - Ey:     29.03 seconds.
+      From worker 2:	     - Ez:     62.60 seconds.
+      From worker 3:	     - Ez:     67.19 seconds.
+  128.27 seconds.
+Using a secondary field approach!
+Forming discretized operators:              2.49 seconds.
+This is an anisotropic case! 
+tri-axis anisotropy! 
+tri-axis anisotropy! 
+Linear Solver: MUMPS
+Solving the forward linear system of the 1 / 1 th frequency ...
+   - MUMPS factorization phase:           204.47 seconds.
+   - MUMPS solution phase:                  6.65 seconds.
+   -   212.51  seconds in total.
+Forming receiver projection matrix:         5.79 seconds.
+Writing out the forward responses ...
+=== Finishing forward problem ===
+========== Total elapsed time:     362.72 seconds. ==========

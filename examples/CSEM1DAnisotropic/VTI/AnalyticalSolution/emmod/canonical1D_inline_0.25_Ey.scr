@@ -1,0 +1,31 @@
+#!/bin/bash
+
+./emmodx \
+	freq=0.25 \
+	file_out=canonical1D_inline_0.25_Ey.rslt \
+	writebin=0 \
+	nx=2 \
+	ny=162 \
+	zsrc=950 \
+	zrcv=1000 \
+	dx=200 \
+	dy=100 \
+	z=-1,0,1000,2000,2100 \
+	econdV=0,3.3,0.1,0.02,1 \
+	econdH=0,3.3,1,0.02,1 \
+	epermV=1,80,17,2.1,17 \
+	epermH=1,80,17,2.1,17 \
+	mpermV=1,1,1,1,1 \
+	mpermH=1,1,1,1,1 \
+	verbose=1 \
+	component=22 \
+        nd=1000 \
+        startlogx=-6 \
+        deltalogx=0.8 \
+        nlogx=16 \
+	kmax=0.628625 \
+        c1=-0.00083333 \
+        c2=-0.0029167 \
+	maxpt=500 \
+	dopchip=0 \
+	xdirect=1
