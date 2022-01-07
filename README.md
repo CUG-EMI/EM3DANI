@@ -23,7 +23,7 @@ EM3DANI is compatible with Julia v0.7 and later versions. We recommend to instal
 Go to the [Julia download page](https://julialang.org/downloads/) to download the Windows command line version (.exe) and install it.
 
 ### Linux systems
-Although Julia is a cross-platform language, we strongly recommend to run EM3DANI under Linux rather than Windows. This is because some of the third-party packages utilized by EM3DANI such as **Dipole1D** and **MUMPS.jl** are more straightforward to complie under Linux.
+Although Julia is a cross-platform language, we strongly recommend to run EM3DANI under Linux rather than Windows. This is because some of the third-party packages utilized by EM3DANI such as **Dipole1D** and **MUMPS.jl** are more straightforward to compile under Linux.
 
 There are three ways to install Julia on Linux:
 
